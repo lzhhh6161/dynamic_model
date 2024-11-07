@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="gui" default="true" />
+    <arg name="paused" default="false" />                 <!-- 如果设置为true，动态障碍物无法移动 -->
+    <arg name="use_sim_time" default="true" />
+    <arg name="headless" default="false" />
+    <arg name="debug" default="false" />
+    <arg name="world_name" value="$(find dynamic_model)/test.world"/> 
+  </include>
+
+</launch>
