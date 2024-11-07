@@ -1,6 +1,7 @@
 ## GAZEBO中生成动态障碍物的插件
 
 > 使用方法：
+ 
  拷贝到catkin_ws/src 后，直接catkin_make编译，会在dynamic_model/plugins文件夹下生成.so插件
 
  然后可以在gazebo.world里面为物体添加插件，可以参考test.world文件
