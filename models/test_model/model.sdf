@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+<model name="test_model">
+  <!-- if set static = False, the scene model will be moveable and drop.-->
+  <static> true </static>
+  <!-- Give the base link a unique name -->
+  <link name="test_model">
+    <!-- The visual is mostly a copy of the collision -->
+    <pose>0 0 0 0 0 0</pose>
+    <collision name='collision'>
+      <geometry>
+        <mesh>
+          <uri>model://test_model/meshes/test_model.dae</uri>
+        </mesh>
+      </geometry>
+        <surface>
+          <friction>
+            <ode>
+            <!-- mu: vertical friction coefficient -->
+              <mu>100</mu> 
+            <!-- mu2: horizontal friction coefficient -->  
+              <mu2>50</mu2>
+            </ode>
+          </friction>
+        </surface>
+    </collision>
+    <visual name="visual">
+  <!-- Offset the visual by have the base's height. We are not rotating
+       mesh since symmetrical -->
+      <geometry>
+        <mesh>
+          <uri>model://test_model/meshes/test_model.dae</uri>
+        </mesh>
+      </geometry>
+    </visual>
+  </link>
+</model>
+</sdf>
