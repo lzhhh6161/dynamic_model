@@ -1,36 +1,55 @@
 <sdf version='1.7'>
   <world name='default'>
-    <model name="person1_0.5_0.5_1.8">
+    <model name="cylinder_05_05_1_1">
+      <static> False </static>
       <pose>0 0 0 0 0 0</pose>
-      <link name='link'>
-        <gravity>0</gravity>
-        <collision name='bottom'>
-          <pose>0 0 0.0 0 -0 1.57</pose>
+      <link name="box_link">
+        <!-- 是否受重力影响（1受重力，0不受） -->
+        <gravity>1</gravity>
+        <collision name="box_collision">
           <geometry>
-            <mesh>
-              <uri>model://person/meshes/walking.dae</uri>
-            </mesh>
+            <cylinder>
+              <radius>0.5</radius>  <!-- 半径（根据需要调整） -->
+              <length>2</length>    <!-- 长度（沿z轴的高度，根据需要调整） -->
+            </cylinder>
           </geometry>
         </collision>
-        <visual name='visual'>
-          <pose>0 0 0.01 0 -0 1.57</pose>
+        <visual name="box_visual">
           <geometry>
-            <mesh>
-              <uri>model://person/meshes/walking.dae</uri>
-            </mesh>
+            <cylinder>
+              <radius>0.5</radius>  <!-- 半径（根据需要调整） -->
+              <length>2</length>    <!-- 长度（沿z轴的高度，根据需要调整） -->
+            </cylinder>
           </geometry>
+          <material>
+            <ambient>0.5 0.5 0.5 1</ambient>  
+            <diffuse>0.5 0.5 0.5 1</diffuse>
+          </material>
         </visual>
       </link>
       <plugin name="obstacle_motion" filename="libobstaclePathPlugin.so">
-        <loop>0</loop>
-        <velocity>0.5</velocity>
-        <angular_velocity>0.8</angular_velocity>
+        <velocity>1.0</velocity>           <!-- 匀速模式下的速度 -->
+        <orientation>false</orientation>
+        <angular_velocity>0.0</angular_velocity>  <!-- 转向角速度 -->
+        <max_velocity>3.0</max_velocity>   <!-- 最大速度限制 -->
+        
+        <!-- 原始路径点：A→B→C -->
         <path>
-          <waypoint>1.0 1.0 0.0</waypoint>
-          <waypoint>3.0 1.0 0.0</waypoint>
+            <waypoint>3 -4 1</waypoint>    <!-- A点 -->   <!--Z坐标记得设置,一般为高度的一半 -->
+            <waypoint>3 4 1</waypoint>    <!-- B点 -->
+            <waypoint>6 4 1</waypoint>    <!-- C点 -->
         </path>
+        
+        <!-- 分段加速度（顺序对应：A→B、B→C、C→B、B→A） -->
+        <accelerations>
+            <a>1.0</a>   <!-- A→B：加速 -->
+            <a>0.5</a>   <!-- B→C：加速 -->
+            <a>0.8</a>   <!-- C→B：加速 -->
+            <a>0.0</a>   <!-- B→A：加速 -->
+
+        </accelerations>
       </plugin>
-    </model>  
+    </model> 
     
     <light name='sun' type='directional'>
       <cast_shadows>1</cast_shadows>

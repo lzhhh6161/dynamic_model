@@ -25,6 +25,10 @@ namespace gazebo
   	std::vector<ignition::math::Vector3d> path;
   	std::vector<std::vector<double>> pathWithAngle;
   	std::vector<double> timeKnot;
+    
+    std::vector<double> accelerations;  // 每个路径段的加速度
+    double maxVelocity;                 // 最大速度限制
+    double currentVelocity;             // 当前速度（用于加速计算）
 
   public: 
     void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
