@@ -184,14 +184,46 @@ namespace gazebo
           }
       }
 
-      // 创建动画并设置关键帧
+      // 新增：对路径进行密集线性插值，解决样条插值的速度问题
+      std::vector<std::vector<double>> densePath;  // 密集插值后的路径点
+      std::vector<double> denseTimeKnot;           // 对应密集点的时间节点
+      const int interpolateSteps = 500;  // 每段插值步数，可根据需要调整（越大越接近线性）
+
+      for (int i = 0; i < this->pathWithAngle.size() - 1; ++i) {
+          auto& poseCurr = this->pathWithAngle[i];
+          auto& poseNext = this->pathWithAngle[i+1];
+          double tStart = this->timeKnot[i];
+          double tEnd = this->timeKnot[i+1];
+          double tStep = (tEnd - tStart) / interpolateSteps;
+
+          // 计算各轴的线性步长
+          double xStep = (poseNext[0] - poseCurr[0]) / interpolateSteps;
+          double yStep = (poseNext[1] - poseCurr[1]) / interpolateSteps;
+          double zStep = (poseNext[2] - poseCurr[2]) / interpolateSteps;
+          double yawStep = (poseNext[3] - poseCurr[3]) / interpolateSteps;
+
+          // 插入中间点，形成密集关键帧
+          for (int j = 0; j <= interpolateSteps; ++j) {
+              double t = tStart + j * tStep;
+              double x = poseCurr[0] + j * xStep;
+              double y = poseCurr[1] + j * yStep;
+              double z = poseCurr[2] + j * zStep;
+              double yaw = poseCurr[3] + j * yawStep;
+
+              densePath.push_back({x, y, z, yaw});
+              denseTimeKnot.push_back(t);
+          }
+      }
+
+      // 创建动画并设置关键帧（使用密集插值后的路径）
       gazebo::common::PoseAnimationPtr anim(
           new gazebo::common::PoseAnimation("obstaclePath", totalTime, true));
       gazebo::common::PoseKeyFrame* key;
 
-      for (int i = 0; i < this->pathWithAngle.size(); ++i) {
-          double t = this->timeKnot[i];
-          std::vector<double> pose = this->pathWithAngle[i];
+      // 使用密集插值后的关键帧
+      for (int i = 0; i < densePath.size(); ++i) {
+          double t = denseTimeKnot[i];
+          auto& pose = densePath[i];
           double x = pose[0], y = pose[1], z = pose[2], yaw = pose[3];
 
           key = anim->CreateKeyFrame(t);
@@ -205,6 +237,7 @@ namespace gazebo
 
     std::vector<double>& DynamicObstacle::interpolateAngle(double start, double end, double dx){
       static std::vector<double> interpolation;
+      interpolation.clear();  // 清除上一次的插值结果，避免累积
       double angleDiff = end - start;
       double angleDiffABS = std::abs(angleDiff);
 
